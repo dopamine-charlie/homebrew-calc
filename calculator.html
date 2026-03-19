@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sublingual & Injectable Mix Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f4f8; color: #1a202c; padding: 16px; }
+
+  h1 { background: #AED6F1; padding: 16px 20px; border-radius: 10px; font-size: 1.4rem; text-align: center; margin-bottom: 20px; color: #1a3a5c; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 900px; margin: 0 auto; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #AED6F1; color: #1a3a5c; }
+
+  .field { margin-bottom: 10px; }
+  label { display: block; font-size: 0.78rem; font-weight: 600; color: #4a5568; margin-bottom: 3px; }
+  select, input[type="number"], input[type="text"] {
+    width: 100%; padding: 7px 10px; border: 1px solid #cbd5e0; border-radius: 6px;
+    font-size: 0.9rem; background: #EBF5FB; color: #1a202c;
+  }
+  select:focus, input:focus { outline: 2px solid #AED6F1; border-color: #AED6F1; }
+
+  .pct-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .pct-check { margin-top: 8px; padding: 7px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-align: center; }
+  .pct-ok   { background: #27AE60; color: white; }
+  .pct-bad  { background: #E74C3C; color: white; }
+
+  .fullname { font-size: 0.78rem; font-style: italic; color: #666; margin-top: 4px; min-height: 16px; }
+
+  .outputs { margin-top: 14px; }
+  .output-row { display: flex; justify-content: space-between; align-items: center;
+    background: #D5F5E3; border-radius: 6px; padding: 7px 12px; margin-bottom: 6px; }
+  .output-row .out-label { font-size: 0.78rem; color: #1a5c36; font-weight: 600; }
+  .output-row .out-val   { font-size: 1rem; font-weight: 700; color: #1a5c36; min-width: 70px; text-align: right; }
+
+  .note { background: #FDFD96; border: 2px solid #e6c800; border-radius: 8px; padding: 12px 16px;
+    font-size: 0.82rem; font-weight: 600; margin-top: 16px; max-width: 900px; margin-left: auto; margin-right: auto; }
+
+  .library-wrap { max-width: 900px; margin: 16px auto 0; }
+  .library-wrap h2 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: #1a3a5c; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); font-size: 0.8rem; }
+  th { background: #D5D8DC; padding: 9px 12px; text-align: left; font-weight: 700; }
+  td { padding: 7px 12px; border-top: 1px solid #eee; }
+  tr:nth-child(even) td { background: #F2F3F4; }
+  tr:nth-child(odd)  td { background: #FFFFFF; }
+
+  .wide { grid-column: 1 / -1; }
+
+  /* Save button */
+  .save-bar { max-width: 900px; margin: 0 auto 16px; display: flex; gap: 10px; align-items: center; }
+  .btn-save { background: #2E86C1; color: white; border: none; border-radius: 8px; padding: 10px 22px;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+  .btn-save:hover { background: #1a5c8a; }
+  .save-name { flex: 1; padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 8px;
+    font-size: 0.9rem; background: white; }
+
+  /* Recipe log */
+  .log-wrap { max-width: 900px; margin: 0 auto 32px; }
+  .log-wrap h2 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: #1a3a5c; display: flex; justify-content: space-between; align-items: center; }
+  .btn-clear-all { background: none; border: 1px solid #E74C3C; color: #E74C3C; border-radius: 6px;
+    padding: 3px 10px; font-size: 0.75rem; cursor: pointer; }
+  .btn-clear-all:hover { background: #E74C3C; color: white; }
+  .log-empty { color: #aaa; font-size: 0.85rem; font-style: italic; padding: 12px 0; }
+
+  .recipe-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 12px; overflow: hidden; }
+  .recipe-header { display: flex; justify-content: space-between; align-items: center;
+    background: #EBF5FB; padding: 10px 16px; }
+  .recipe-title { font-weight: 700; font-size: 0.95rem; color: #1a3a5c; }
+  .recipe-date  { font-size: 0.75rem; color: #666; margin-top: 2px; }
+  .btn-delete { background: none; border: none; color: #E74C3C; font-size: 1.1rem; cursor: pointer; padding: 0 4px; }
+  .recipe-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media (max-width: 640px) { .recipe-body { grid-template-columns: 1fr; } }
+  .recipe-section { padding: 12px 16px; }
+  .recipe-section + .recipe-section { border-left: 1px solid #f0f4f8; }
+  .recipe-section h4 { font-size: 0.78rem; font-weight: 700; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .recipe-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 2px 0; }
+  .recipe-row .rl { color: #555; }
+  .recipe-row .rv { font-weight: 600; color: #1a202c; }
+</style>
+</head>
+<body>
+
+<h1>Sublingual &amp; Injectable Mix Calculator</h1>
+
+<div class="grid" style="max-width:900px;margin:0 auto 16px;">
+
+  <!-- COMMON INPUTS -->
+  <div class="card wide">
+    <h2>Common Inputs</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <div class="field">
+          <label>Compound Nickname</label>
+          <select id="nickname" onchange="onNicknameChange()"></select>
+          <div class="fullname" id="fullname"></div>
+        </div>
+        <div class="field">
+          <label>Displacement Ratio (ml/g)</label>
+          <input type="number" id="displacement" step="0.001" min="0" oninput="recalc()">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:#4a5568;">Solvent Mix — remainder auto-fills carrier oil</label>
+        <div class="pct-row" style="margin-top:4px;">
+          <div class="field">
+            <label>% BB</label>
+            <input type="number" id="pct_bb" value="20" min="0" max="100" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>% BA</label>
+            <input type="number" id="pct_ba" value="2" min="0" max="100" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label>% EO</label>
+            <input type="number" id="pct_eo" value="0" min="0" max="100" oninput="recalc()">
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label>Carrier Oil</label>
+          <select id="carrier_oil" onchange="recalc()">
+            <option value="MCT">MCT Oil</option>
+            <option value="GSO">GSO (Grapeseed Oil)</option>
+          </select>
+        </div>
+        <div class="pct-check" id="pct_check" style="margin-top:6px;">Carrier oil: 78%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="card">
+    <h2>I Have a Powder Packet</h2>
+    <div class="field">
+      <label>Powder Grams I Have</label>
+      <input type="number" id="s1_grams" value="50" min="0" step="0.1" oninput="recalc()">
+    </div>
+    <div class="field">
+      <label>Desired Concentration (mg/ml)</label>
+      <input type="number" id="s1_conc" value="250" min="0" step="1" oninput="recalc()">
+    </div>
+    <div class="outputs">
+      <div class="output-row"><span class="out-label">Total Volume I Can Make</span><span class="out-val"><span id="s1_total_vol">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Powder Displacement Vol</span><span class="out-val"><span id="s1_disp_vol">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Solvent Volume Needed</span><span class="out-val"><span id="s1_solvent">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of BB</span><span class="out-val"><span id="s1_bb">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of BA</span><span class="out-val"><span id="s1_ba">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of EO</span><span class="out-val"><span id="s1_eo">—</span> mL</span></div>
+      <div class="output-row" style="background:#D6EAF8;"><span class="out-label" style="color:#1a3a5c;" id="s1_carrier_label">mL of MCT Oil</span><span class="out-val" style="color:#1a3a5c;"><span id="s1_carrier">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Final Concentration Check</span><span class="out-val"><span id="s1_check">—</span> mg/mL</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="card">
+    <h2>I Want to Make X mL</h2>
+    <div class="field">
+      <label>Desired Total Volume (mL)</label>
+      <input type="number" id="s2_vol" value="60" min="0" step="1" oninput="recalc()">
+    </div>
+    <div class="field">
+      <label>Desired Concentration (mg/ml)</label>
+      <input type="number" id="s2_conc" value="250" min="0" step="1" oninput="recalc()">
+    </div>
+    <div class="outputs">
+      <div class="output-row"><span class="out-label">Grams of Powder Needed</span><span class="out-val"><span id="s2_grams">—</span> g</span></div>
+      <div class="output-row"><span class="out-label">Powder Displacement Vol</span><span class="out-val"><span id="s2_disp_vol">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Solvent Volume to Add</span><span class="out-val"><span id="s2_solvent">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of BB</span><span class="out-val"><span id="s2_bb">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of BA</span><span class="out-val"><span id="s2_ba">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">mL of EO</span><span class="out-val"><span id="s2_eo">—</span> mL</span></div>
+      <div class="output-row" style="background:#D6EAF8;"><span class="out-label" style="color:#1a3a5c;" id="s2_carrier_label">mL of MCT Oil</span><span class="out-val" style="color:#1a3a5c;"><span id="s2_carrier">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Final Concentration Check</span><span class="out-val"><span id="s2_check">—</span> mg/mL</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="note" style="max-width:900px;margin:0 auto 16px;">
+  ⚠️ Set BB%, BA%, and EO% to whatever you want. The remainder automatically becomes your carrier oil (MCT or GSO). Displacement is handled automatically — carrier oil fills the rest of the solvent volume to hit your target.
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <input class="save-name" type="text" id="recipe_name" placeholder="Recipe name (optional, e.g. Test-E 250 batch 1)">
+  <button class="btn-save" onclick="saveRecipe()">💾 Save Recipe</button>
+</div>
+
+<!-- RECIPE LOG -->
+<div class="log-wrap">
+  <h2>Saved Recipes <button class="btn-clear-all" onclick="clearAll()">Clear All</button></h2>
+  <div id="recipe_log"><p class="log-empty">No saved recipes yet. Hit Save Recipe to log a snapshot.</p></div>
+</div>
+
+<!-- LIBRARY -->
+<div class="library-wrap">
+  <h2>Compound Library</h2>
+  <table id="lib_table">
+    <thead><tr><th>Nickname</th><th>Full Name</th><th>Displacement (ml/g)</th><th>Notes</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+const COMPOUNDS = [
+  { nick: "Test-Base",   full: "Testosterone Base",                              disp: 0.894, notes: "avg of 0.893–0.895" },
+  { nick: "Test-Prop",   full: "Testosterone Propionate",                        disp: 0.910, notes: "avg of 0.909–0.910" },
+  { nick: "Test-Enth",   full: "Testosterone Enanthate",                         disp: 0.943, notes: "" },
+  { nick: "Test-Cyp",    full: "Testosterone Cypionate",                         disp: 0.909, notes: "" },
+  { nick: "Test-Deca",   full: "Testosterone Decanoate",                         disp: 0.962, notes: "" },
+  { nick: "Test-Iso",    full: "Testosterone Isocaproate",                       disp: 0.935, notes: "" },
+  { nick: "Test-Phenyl", full: "Testosterone Phenylpropionate",                  disp: 0.885, notes: "" },
+  { nick: "Tren-Ace",    full: "Trenbolone Acetate",                             disp: 0.848, notes: "" },
+  { nick: "Tren-Enth",   full: "Trenbolone Enanthate",                           disp: 0.909, notes: "" },
+  { nick: "Nand-Deca",   full: "Nandrolone Decanoate (Deca)",                    disp: 0.962, notes: "" },
+  { nick: "NPP",         full: "Nandrolone Phenylpropionate (NPP)",              disp: 0.909, notes: "" },
+  { nick: "EQ",          full: "Boldenone Undecylenate (EQ)",                    disp: 0.909, notes: "" },
+  { nick: "Mast-Prop",   full: "Masteron Propionate",                            disp: 0.935, notes: "" },
+  { nick: "Mast-Enth",   full: "Masteron Enanthate",                             disp: 1.000, notes: "" },
+  { nick: "Trest-Ace",   full: "Trestolone Acetate",                             disp: 0.901, notes: "" },
+  { nick: "Custom",      full: "Any other (carnosine, MB, SLU-PP-332, etc.)",   disp: null,  notes: "Use for non-steroids — enter displacement manually" },
+];
+
+function fmt(n) { return isNaN(n) || !isFinite(n) ? "—" : n.toFixed(2); }
+function v(id)  { return parseFloat(document.getElementById(id).value) || 0; }
+
+function buildDropdown() {
+  const sel = document.getElementById("nickname");
+  COMPOUNDS.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.nick;
+    opt.textContent = c.nick;
+    sel.appendChild(opt);
+  });
+}
+
+function buildLibrary() {
+  const tbody = document.querySelector("#lib_table tbody");
+  COMPOUNDS.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${c.nick}</td><td>${c.full}</td><td>${c.disp !== null ? c.disp.toFixed(3) : "—"}</td><td>${c.notes}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function onNicknameChange() {
+  const nick = document.getElementById("nickname").value;
+  const compound = COMPOUNDS.find(c => c.nick === nick);
+  document.getElementById("fullname").textContent = compound ? compound.full : "";
+  const dispInput = document.getElementById("displacement");
+  if (compound && compound.disp !== null) {
+    dispInput.value = compound.disp;
+    dispInput.readOnly = true;
+    dispInput.style.background = "#EBF5FB";
+  } else {
+    dispInput.value = "";
+    dispInput.readOnly = false;
+    dispInput.style.background = "#FFF9C4";
+    dispInput.placeholder = "Enter manually";
+  }
+  recalc();
+}
+
+function recalc() {
+  const disp        = parseFloat(document.getElementById("displacement").value) || 0;
+  const bb_pct      = v("pct_bb");
+  const ba_pct      = v("pct_ba");
+  const eo_pct      = v("pct_eo");
+  const used_pct    = bb_pct + ba_pct + eo_pct;
+  const carrier_pct = Math.max(0, 100 - used_pct);
+  const carrier     = document.getElementById("carrier_oil").value;
+  const carrierName = carrier === "MCT" ? "MCT Oil" : "GSO (Grapeseed Oil)";
+
+  // Update carrier oil labels
+  document.getElementById("s1_carrier_label").textContent = "mL of " + carrierName;
+  document.getElementById("s2_carrier_label").textContent = "mL of " + carrierName;
+
+  // Percent indicator
+  const pctEl = document.getElementById("pct_check");
+  if (used_pct > 100) {
+    pctEl.textContent = `BB+BA+EO = ${used_pct.toFixed(1)}% — exceeds 100%!`;
+    pctEl.className = "pct-check pct-bad";
+  } else {
+    pctEl.textContent = `${carrierName}: ${carrier_pct.toFixed(1)}% of solvent`;
+    pctEl.className = "pct-check pct-ok";
+  }
+
+  // Section 1
+  const s1_g  = v("s1_grams");
+  const s1_c  = v("s1_conc");
+  const s1_tv = s1_c > 0 ? (s1_g * 1000) / s1_c : NaN;
+  const s1_dv = s1_g * disp;
+  const s1_sv = s1_tv - s1_dv;
+  document.getElementById("s1_total_vol").textContent = fmt(s1_tv);
+  document.getElementById("s1_disp_vol").textContent  = fmt(s1_dv);
+  document.getElementById("s1_solvent").textContent   = fmt(s1_sv);
+  document.getElementById("s1_bb").textContent        = fmt(s1_sv * bb_pct / 100);
+  document.getElementById("s1_ba").textContent        = fmt(s1_sv * ba_pct / 100);
+  document.getElementById("s1_eo").textContent        = fmt(s1_sv * eo_pct / 100);
+  document.getElementById("s1_carrier").textContent   = fmt(s1_sv * carrier_pct / 100);
+  document.getElementById("s1_check").textContent     = fmt(s1_tv > 0 ? (s1_g * 1000) / s1_tv : NaN);
+
+  // Section 2
+  const s2_v  = v("s2_vol");
+  const s2_c  = v("s2_conc");
+  const s2_g  = (s2_v * s2_c) / 1000;
+  const s2_dv = s2_g * disp;
+  const s2_sv = s2_v - s2_dv;
+  document.getElementById("s2_grams").textContent     = fmt(s2_g);
+  document.getElementById("s2_disp_vol").textContent  = fmt(s2_dv);
+  document.getElementById("s2_solvent").textContent   = fmt(s2_sv);
+  document.getElementById("s2_bb").textContent        = fmt(s2_sv * bb_pct / 100);
+  document.getElementById("s2_ba").textContent        = fmt(s2_sv * ba_pct / 100);
+  document.getElementById("s2_eo").textContent        = fmt(s2_sv * eo_pct / 100);
+  document.getElementById("s2_carrier").textContent   = fmt(s2_sv * carrier_pct / 100);
+  document.getElementById("s2_check").textContent     = fmt(s2_v > 0 ? (s2_g * 1000) / s2_v : NaN);
+}
+
+function getSnapshot() {
+  const disp        = parseFloat(document.getElementById("displacement").value) || 0;
+  const bb_pct      = v("pct_bb");
+  const ba_pct      = v("pct_ba");
+  const eo_pct      = v("pct_eo");
+  const used_pct    = bb_pct + ba_pct + eo_pct;
+  const carrier_pct = Math.max(0, 100 - used_pct);
+  const carrier     = document.getElementById("carrier_oil").value;
+  const carrierName = carrier === "MCT" ? "MCT Oil" : "GSO (Grapeseed Oil)";
+  const nick        = document.getElementById("nickname").value;
+  const fullname    = document.getElementById("fullname").textContent;
+
+  const s1_g  = v("s1_grams"), s1_c = v("s1_conc");
+  const s1_tv = s1_c > 0 ? (s1_g * 1000) / s1_c : NaN;
+  const s1_dv = s1_g * disp, s1_sv = s1_tv - s1_dv;
+
+  const s2_v  = v("s2_vol"), s2_c = v("s2_conc");
+  const s2_g  = (s2_v * s2_c) / 1000;
+  const s2_dv = s2_g * disp, s2_sv = s2_v - s2_dv;
+
+  return {
+    name: document.getElementById("recipe_name").value.trim(),
+    date: new Date().toLocaleString(),
+    compound: nick, fullname,
+    disp, bb_pct, ba_pct, eo_pct, carrier_pct, carrierName,
+    s1: { grams: s1_g, conc: s1_c, total_vol: s1_tv, disp_vol: s1_dv, solvent: s1_sv,
+          bb: s1_sv*bb_pct/100, ba: s1_sv*ba_pct/100, eo: s1_sv*eo_pct/100,
+          carrier: s1_sv*carrier_pct/100, check: s1_tv>0?(s1_g*1000)/s1_tv:NaN },
+    s2: { vol: s2_v, conc: s2_c, grams: s2_g, disp_vol: s2_dv, solvent: s2_sv,
+          bb: s2_sv*bb_pct/100, ba: s2_sv*ba_pct/100, eo: s2_sv*eo_pct/100,
+          carrier: s2_sv*carrier_pct/100, check: s2_v>0?(s2_g*1000)/s2_v:NaN }
+  };
+}
+
+function saveRecipe() {
+  const snap = getSnapshot();
+  const recipes = JSON.parse(localStorage.getItem("hb_recipes") || "[]");
+  snap.id = Date.now();
+  recipes.unshift(snap);
+  localStorage.setItem("hb_recipes", JSON.stringify(recipes));
+  document.getElementById("recipe_name").value = "";
+  renderLog();
+}
+
+function deleteRecipe(id) {
+  let recipes = JSON.parse(localStorage.getItem("hb_recipes") || "[]");
+  recipes = recipes.filter(r => r.id !== id);
+  localStorage.setItem("hb_recipes", JSON.stringify(recipes));
+  renderLog();
+}
+
+function clearAll() {
+  if (confirm("Delete all saved recipes?")) {
+    localStorage.removeItem("hb_recipes");
+    renderLog();
+  }
+}
+
+function renderLog() {
+  const recipes = JSON.parse(localStorage.getItem("hb_recipes") || "[]");
+  const el = document.getElementById("recipe_log");
+  if (!recipes.length) {
+    el.innerHTML = '<p class="log-empty">No saved recipes yet. Hit Save Recipe to log a snapshot.</p>';
+    return;
+  }
+  el.innerHTML = recipes.map(r => `
+    <div class="recipe-card">
+      <div class="recipe-header">
+        <div>
+          <div class="recipe-title">${r.name || r.compound + (r.s1.conc ? " @ " + r.s1.conc + " mg/mL" : "")} &nbsp;<span style="font-weight:400;font-size:0.82rem;color:#555;">(${r.compound} — ${r.fullname})</span></div>
+          <div class="recipe-date">${r.date}</div>
+        </div>
+        <button class="btn-delete" onclick="deleteRecipe(${r.id})" title="Delete">✕</button>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">
+          <h4>Inputs</h4>
+          <div class="recipe-row"><span class="rl">Displacement</span><span class="rv">${r.disp} ml/g</span></div>
+          <div class="recipe-row"><span class="rl">% BB / BA / EO</span><span class="rv">${r.bb_pct}% / ${r.ba_pct}% / ${r.eo_pct}%</span></div>
+          <div class="recipe-row"><span class="rl">Carrier Oil</span><span class="rv">${r.carrierName} (${r.carrier_pct.toFixed(1)}%)</span></div>
+          <h4 style="margin-top:10px;">From Powder Packet</h4>
+          <div class="recipe-row"><span class="rl">Grams</span><span class="rv">${fmt(r.s1.grams)} g</span></div>
+          <div class="recipe-row"><span class="rl">Target Conc</span><span class="rv">${fmt(r.s1.conc)} mg/mL</span></div>
+        </div>
+        <div class="recipe-section">
+          <h4>From Powder Packet — Results</h4>
+          <div class="recipe-row"><span class="rl">Total Volume</span><span class="rv">${fmt(r.s1.total_vol)} mL</span></div>
+          <div class="recipe-row"><span class="rl">Displacement Vol</span><span class="rv">${fmt(r.s1.disp_vol)} mL</span></div>
+          <div class="recipe-row"><span class="rl">Solvent Vol</span><span class="rv">${fmt(r.s1.solvent)} mL</span></div>
+          <div class="recipe-row"><span class="rl">BB</span><span class="rv">${fmt(r.s1.bb)} mL</span></div>
+          <div class="recipe-row"><span class="rl">BA</span><span class="rv">${fmt(r.s1.ba)} mL</span></div>
+          <div class="recipe-row"><span class="rl">EO</span><span class="rv">${fmt(r.s1.eo)} mL</span></div>
+          <div class="recipe-row"><span class="rl">${r.carrierName}</span><span class="rv">${fmt(r.s1.carrier)} mL</span></div>
+          <div class="recipe-row"><span class="rl">Conc Check</span><span class="rv">${fmt(r.s1.check)} mg/mL</span></div>
+          <h4 style="margin-top:10px;">Make X mL — Results</h4>
+          <div class="recipe-row"><span class="rl">Target Vol</span><span class="rv">${fmt(r.s2.vol)} mL @ ${fmt(r.s2.conc)} mg/mL</span></div>
+          <div class="recipe-row"><span class="rl">Powder Needed</span><span class="rv">${fmt(r.s2.grams)} g</span></div>
+          <div class="recipe-row"><span class="rl">BB / BA / EO</span><span class="rv">${fmt(r.s2.bb)} / ${fmt(r.s2.ba)} / ${fmt(r.s2.eo)} mL</span></div>
+          <div class="recipe-row"><span class="rl">${r.carrierName}</span><span class="rv">${fmt(r.s2.carrier)} mL</span></div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+buildDropdown();
+buildLibrary();
+onNicknameChange();
+renderLog();
+</script>
+</body>
+</html>
