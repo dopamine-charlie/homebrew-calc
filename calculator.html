@@ -298,10 +298,13 @@ function recalc() {
   document.getElementById("s1_total_vol").textContent = fmt(s1_tv);
   document.getElementById("s1_disp_vol").textContent  = fmt(s1_dv);
   document.getElementById("s1_solvent").textContent   = fmt(s1_sv);
-  document.getElementById("s1_bb").textContent        = fmt(s1_sv * bb_pct / 100);
-  document.getElementById("s1_ba").textContent        = fmt(s1_sv * ba_pct / 100);
-  document.getElementById("s1_eo").textContent        = fmt(s1_sv * eo_pct / 100);
-  document.getElementById("s1_carrier").textContent   = fmt(s1_sv * carrier_pct / 100);
+  const s1_bb = s1_tv * bb_pct / 100;
+  const s1_ba = s1_tv * ba_pct / 100;
+  const s1_eo = s1_tv * eo_pct / 100;
+  document.getElementById("s1_bb").textContent        = fmt(s1_bb);
+  document.getElementById("s1_ba").textContent        = fmt(s1_ba);
+  document.getElementById("s1_eo").textContent        = fmt(s1_eo);
+  document.getElementById("s1_carrier").textContent   = fmt(s1_sv - s1_bb - s1_ba - s1_eo);
   document.getElementById("s1_check").textContent     = fmt(s1_tv > 0 ? (s1_g * 1000) / s1_tv : NaN);
 
   // Section 2
@@ -313,10 +316,13 @@ function recalc() {
   document.getElementById("s2_grams").textContent     = fmt(s2_g);
   document.getElementById("s2_disp_vol").textContent  = fmt(s2_dv);
   document.getElementById("s2_solvent").textContent   = fmt(s2_sv);
-  document.getElementById("s2_bb").textContent        = fmt(s2_sv * bb_pct / 100);
-  document.getElementById("s2_ba").textContent        = fmt(s2_sv * ba_pct / 100);
-  document.getElementById("s2_eo").textContent        = fmt(s2_sv * eo_pct / 100);
-  document.getElementById("s2_carrier").textContent   = fmt(s2_sv * carrier_pct / 100);
+  const s2_bb = s2_v * bb_pct / 100;
+  const s2_ba = s2_v * ba_pct / 100;
+  const s2_eo = s2_v * eo_pct / 100;
+  document.getElementById("s2_bb").textContent        = fmt(s2_bb);
+  document.getElementById("s2_ba").textContent        = fmt(s2_ba);
+  document.getElementById("s2_eo").textContent        = fmt(s2_eo);
+  document.getElementById("s2_carrier").textContent   = fmt(s2_sv - s2_bb - s2_ba - s2_eo);
   document.getElementById("s2_check").textContent     = fmt(s2_v > 0 ? (s2_g * 1000) / s2_v : NaN);
 }
 
@@ -346,11 +352,11 @@ function getSnapshot() {
     compound: nick, fullname,
     disp, bb_pct, ba_pct, eo_pct, carrier_pct, carrierName,
     s1: { grams: s1_g, conc: s1_c, total_vol: s1_tv, disp_vol: s1_dv, solvent: s1_sv,
-          bb: s1_sv*bb_pct/100, ba: s1_sv*ba_pct/100, eo: s1_sv*eo_pct/100,
-          carrier: s1_sv*carrier_pct/100, check: s1_tv>0?(s1_g*1000)/s1_tv:NaN },
+          bb: s1_tv*bb_pct/100, ba: s1_tv*ba_pct/100, eo: s1_tv*eo_pct/100,
+          carrier: s1_sv - s1_tv*bb_pct/100 - s1_tv*ba_pct/100 - s1_tv*eo_pct/100, check: s1_tv>0?(s1_g*1000)/s1_tv:NaN },
     s2: { vol: s2_v, conc: s2_c, grams: s2_g, disp_vol: s2_dv, solvent: s2_sv,
-          bb: s2_sv*bb_pct/100, ba: s2_sv*ba_pct/100, eo: s2_sv*eo_pct/100,
-          carrier: s2_sv*carrier_pct/100, check: s2_v>0?(s2_g*1000)/s2_v:NaN }
+          bb: s2_v*bb_pct/100, ba: s2_v*ba_pct/100, eo: s2_v*eo_pct/100,
+          carrier: s2_sv - s2_v*bb_pct/100 - s2_v*ba_pct/100 - s2_v*eo_pct/100, check: s2_v>0?(s2_g*1000)/s2_v:NaN }
   };
 }
 
