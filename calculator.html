@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sublingual & Injectable Mix Calculator</title>
+<title>Sublingual &amp; Injectable Mix Calculator</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f4f8; color: #1a202c; padding: 16px; }
@@ -50,17 +50,42 @@
 
   .wide { grid-column: 1 / -1; }
 
-  /* Save button */
-  .save-bar { max-width: 900px; margin: 0 auto 16px; display: flex; gap: 10px; align-items: center; }
-  .btn-save { background: #2E86C1; color: white; border: none; border-radius: 8px; padding: 10px 22px;
-    font-size: 0.95rem; font-weight: 700; cursor: pointer; }
-  .btn-save:hover { background: #1a5c8a; }
-  .save-name { flex: 1; padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 8px;
-    font-size: 0.9rem; background: white; }
+  /* ── Action Card ── */
+  .action-card { max-width: 900px; margin: 0 auto 16px; background: white; border-radius: 10px;
+    padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .action-card > h2 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 2px solid #AED6F1; color: #1a3a5c; }
+  .action-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .action-fields { grid-template-columns: 1fr; } }
+  .action-fields label { display: block; font-size: 0.78rem; font-weight: 600; color: #4a5568; margin-bottom: 3px; }
+  .action-fields input[type="text"] { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0;
+    border-radius: 6px; font-size: 0.9rem; background: #EBF5FB; color: #1a202c; }
+  .action-fields textarea { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0;
+    border-radius: 6px; font-size: 0.9rem; background: #EBF5FB; color: #1a202c;
+    font-family: inherit; resize: vertical; min-height: 58px; }
+  .action-fields input:focus, .action-fields textarea:focus { outline: 2px solid #AED6F1; border-color: #AED6F1; }
+  .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn-divider { width: 1px; height: 32px; background: #e2e8f0; margin: 0 2px; }
+  @media (max-width: 480px) { .btn-divider { display: none; } }
 
-  /* Recipe log */
+  /* Buttons */
+  .btn-save { background: #2E86C1; color: white; border: none; border-radius: 8px;
+    padding: 10px 20px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+  .btn-save:hover { background: #1a5c8a; }
+  .btn-export { background: #f7fafc; color: #2d3748; border: 1px solid #cbd5e0; border-radius: 8px;
+    padding: 9px 15px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .btn-export:hover { background: #e2e8f0; }
+  .btn-share { background: #f7fafc; color: #2d3748; border: 1px solid #cbd5e0; border-radius: 8px;
+    padding: 9px 15px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .btn-share:hover { background: #e2e8f0; }
+  .btn-sheets { background: #e6f4ea; color: #1b6b31; border: 1px solid #a8d5b5; border-radius: 8px;
+    padding: 9px 15px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .btn-sheets:hover { background: #c8e6c9; }
+
+  /* ── Recipe Log ── */
   .log-wrap { max-width: 900px; margin: 0 auto 32px; }
-  .log-wrap h2 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: #1a3a5c; display: flex; justify-content: space-between; align-items: center; }
+  .log-wrap h2 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: #1a3a5c;
+    display: flex; justify-content: space-between; align-items: center; }
   .btn-clear-all { background: none; border: 1px solid #E74C3C; color: #E74C3C; border-radius: 6px;
     padding: 3px 10px; font-size: 0.75rem; cursor: pointer; }
   .btn-clear-all:hover { background: #E74C3C; color: white; }
@@ -73,14 +98,41 @@
   .recipe-title { font-weight: 700; font-size: 0.95rem; color: #1a3a5c; }
   .recipe-date  { font-size: 0.75rem; color: #666; margin-top: 2px; }
   .btn-delete { background: none; border: none; color: #E74C3C; font-size: 1.1rem; cursor: pointer; padding: 0 4px; }
+  .recipe-notes-bar { padding: 7px 16px; background: #fffde7; border-bottom: 1px solid #f0ead8;
+    font-size: 0.82rem; color: #5d4037; font-style: italic; }
   .recipe-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
   @media (max-width: 640px) { .recipe-body { grid-template-columns: 1fr; } }
   .recipe-section { padding: 12px 16px; }
   .recipe-section + .recipe-section { border-left: 1px solid #f0f4f8; }
-  .recipe-section h4 { font-size: 0.78rem; font-weight: 700; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .recipe-section h4 { font-size: 0.78rem; font-weight: 700; color: #4a5568; margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.04em; }
   .recipe-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 2px 0; }
   .recipe-row .rl { color: #555; }
   .recipe-row .rv { font-weight: 600; color: #1a202c; }
+
+  /* ── Share Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex;
+    align-items: center; justify-content: center; z-index: 1000; }
+  .modal-box { background: white; border-radius: 14px; padding: 24px; width: 310px;
+    max-width: 92vw; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .modal-box h3 { font-size: 1.1rem; font-weight: 700; color: #1a3a5c; margin-bottom: 16px; }
+  .share-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px;
+    border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-size: 0.9rem;
+    font-weight: 600; color: #2d3748; cursor: pointer; margin-bottom: 8px;
+    text-decoration: none; font-family: inherit; }
+  .share-btn:hover { background: #EBF5FB; }
+  .share-icon { font-size: 1.15rem; width: 22px; text-align: center; }
+  .modal-close { margin-top: 4px; width: 100%; padding: 10px; border: 1px solid #e2e8f0;
+    border-radius: 8px; background: #f8fafc; color: #718096; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; font-family: inherit; }
+  .modal-close:hover { background: #e2e8f0; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #2d3748; color: white;
+    padding: 12px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 2000; max-width: 340px;
+    animation: toastIn 0.2s ease; pointer-events: none; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -169,7 +221,7 @@
     <div class="outputs">
       <div class="output-row"><span class="out-label">Grams of Powder Needed</span><span class="out-val"><span id="s2_grams">—</span> g</span></div>
       <div class="output-row"><span class="out-label">Powder Displacement Vol</span><span class="out-val"><span id="s2_disp_vol">—</span> mL</span></div>
-      <div class="output-row"><span class="out-label">Solvent Volume to Add</span><span class="out-val"><span id="s2_solvent">—</span> mL</span></div>
+      <div class="output-row"><span class="out-label">Total Volume to Add</span><span class="out-val"><span id="s2_solvent">—</span> mL</span></div>
       <div class="output-row"><span class="out-label">mL of BB</span><span class="out-val"><span id="s2_bb">—</span> mL</span></div>
       <div class="output-row"><span class="out-label">mL of BA</span><span class="out-val"><span id="s2_ba">—</span> mL</span></div>
       <div class="output-row"><span class="out-label">mL of EO</span><span class="out-val"><span id="s2_eo">—</span> mL</span></div>
@@ -184,16 +236,35 @@
   ⚠️ Set BB%, BA%, and EO% to whatever you want. The remainder automatically becomes your carrier oil (MCT or GSO). Displacement is handled automatically — carrier oil fills the rest of the solvent volume to hit your target.
 </div>
 
-<!-- SAVE BAR -->
-<div class="save-bar">
-  <input class="save-name" type="text" id="recipe_name" placeholder="Recipe name (optional, e.g. Test-E 250 batch 1)">
-  <button class="btn-save" onclick="saveRecipe()">💾 Save Recipe</button>
+<!-- ACTION CARD -->
+<div class="action-card">
+  <h2>Save &amp; Export</h2>
+  <div class="action-fields">
+    <div>
+      <label for="recipe_name">Recipe Name</label>
+      <input type="text" id="recipe_name" placeholder="e.g. Carnitine March 5 2027">
+    </div>
+    <div>
+      <label for="recipe_notes">Notes (optional)</label>
+      <textarea id="recipe_notes" placeholder="Batch notes, source, observations — saved with record and included in exports"></textarea>
+    </div>
+  </div>
+  <div class="action-buttons">
+    <button class="btn-save" onclick="saveRecipe()">💾 Save</button>
+    <div class="btn-divider"></div>
+    <button class="btn-export" onclick="downloadCSV()">📄 CSV</button>
+    <button class="btn-export" onclick="downloadPDF()">📑 PDF</button>
+    <div class="btn-divider"></div>
+    <button class="btn-share" onclick="shareAction()">📤 Share</button>
+    <div class="btn-divider"></div>
+    <button class="btn-sheets" onclick="openInGoogleSheets()">📊 Google Sheets</button>
+  </div>
 </div>
 
 <!-- RECIPE LOG -->
 <div class="log-wrap">
   <h2>Saved Recipes <button class="btn-clear-all" onclick="clearAll()">Clear All</button></h2>
-  <div id="recipe_log"><p class="log-empty">No saved recipes yet. Hit Save Recipe to log a snapshot.</p></div>
+  <div id="recipe_log"><p class="log-empty">No saved recipes yet. Hit Save to log a snapshot.</p></div>
 </div>
 
 <!-- LIBRARY -->
@@ -205,6 +276,27 @@
   </table>
 </div>
 
+<!-- SHARE MODAL -->
+<div id="share-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeShareModal()">
+  <div class="modal-box">
+    <h3>Share Recipe</h3>
+    <button class="share-btn" onclick="copyShareLink()">
+      <span class="share-icon">📋</span> Copy Link
+    </button>
+    <a id="share-email-link" class="share-btn" href="#" onclick="closeShareModal()">
+      <span class="share-icon">✉️</span> Email
+    </a>
+    <a id="share-whatsapp-link" class="share-btn" href="#" target="_blank" rel="noopener" onclick="closeShareModal()">
+      <span class="share-icon">💬</span> WhatsApp
+    </a>
+    <button id="share-native-btn" class="share-btn" onclick="nativeShare()" style="display:none;">
+      <span class="share-icon">📤</span> More options
+    </button>
+    <button class="modal-close" onclick="closeShareModal()">Close</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const COMPOUNDS = [
   { nick: "Test-Base",   full: "Testosterone Base",                              disp: 0.894, notes: "avg of 0.893–0.895" },
@@ -275,11 +367,9 @@ function recalc() {
   const carrier     = document.getElementById("carrier_oil").value;
   const carrierName = carrier === "MCT" ? "MCT Oil" : "GSO (Grapeseed Oil)";
 
-  // Update carrier oil labels
   document.getElementById("s1_carrier_label").textContent = "mL of " + carrierName;
   document.getElementById("s2_carrier_label").textContent = "mL of " + carrierName;
 
-  // Percent indicator
   const pctEl = document.getElementById("pct_check");
   if (used_pct > 100) {
     pctEl.textContent = `BB+BA+EO = ${used_pct.toFixed(1)}% — exceeds 100%!`;
@@ -289,7 +379,6 @@ function recalc() {
     pctEl.className = "pct-check pct-ok";
   }
 
-  // Section 1
   const s1_g  = v("s1_grams");
   const s1_c  = v("s1_conc");
   const s1_tv = s1_c > 0 ? (s1_g * 1000) / s1_c : NaN;
@@ -307,7 +396,6 @@ function recalc() {
   document.getElementById("s1_carrier").textContent   = fmt(s1_sv - s1_bb - s1_ba - s1_eo);
   document.getElementById("s1_check").textContent     = fmt(s1_tv > 0 ? (s1_g * 1000) / s1_tv : NaN);
 
-  // Section 2
   const s2_v  = v("s2_vol");
   const s2_c  = v("s2_conc");
   const s2_g  = (s2_v * s2_c) / 1000;
@@ -347,16 +435,19 @@ function getSnapshot() {
   const s2_dv = s2_g * disp, s2_sv = s2_v - s2_dv;
 
   return {
-    name: document.getElementById("recipe_name").value.trim(),
-    date: new Date().toLocaleString(),
+    name:  document.getElementById("recipe_name").value.trim(),
+    notes: document.getElementById("recipe_notes").value.trim(),
+    date:  new Date().toLocaleString(),
     compound: nick, fullname,
     disp, bb_pct, ba_pct, eo_pct, carrier_pct, carrierName,
     s1: { grams: s1_g, conc: s1_c, total_vol: s1_tv, disp_vol: s1_dv, solvent: s1_sv,
           bb: s1_tv*bb_pct/100, ba: s1_tv*ba_pct/100, eo: s1_tv*eo_pct/100,
-          carrier: s1_sv - s1_tv*bb_pct/100 - s1_tv*ba_pct/100 - s1_tv*eo_pct/100, check: s1_tv>0?(s1_g*1000)/s1_tv:NaN },
+          carrier: s1_sv - s1_tv*bb_pct/100 - s1_tv*ba_pct/100 - s1_tv*eo_pct/100,
+          check: s1_tv > 0 ? (s1_g * 1000) / s1_tv : NaN },
     s2: { vol: s2_v, conc: s2_c, grams: s2_g, disp_vol: s2_dv, solvent: s2_sv,
           bb: s2_v*bb_pct/100, ba: s2_v*ba_pct/100, eo: s2_v*eo_pct/100,
-          carrier: s2_sv - s2_v*bb_pct/100 - s2_v*ba_pct/100 - s2_v*eo_pct/100, check: s2_v>0?(s2_g*1000)/s2_v:NaN }
+          carrier: s2_sv - s2_v*bb_pct/100 - s2_v*ba_pct/100 - s2_v*eo_pct/100,
+          check: s2_v > 0 ? (s2_g * 1000) / s2_v : NaN }
   };
 }
 
@@ -366,8 +457,10 @@ function saveRecipe() {
   snap.id = Date.now();
   recipes.unshift(snap);
   localStorage.setItem("hb_recipes", JSON.stringify(recipes));
-  document.getElementById("recipe_name").value = "";
+  document.getElementById("recipe_name").value  = "";
+  document.getElementById("recipe_notes").value = "";
   renderLog();
+  showToast("Recipe saved!");
 }
 
 function deleteRecipe(id) {
@@ -388,7 +481,7 @@ function renderLog() {
   const recipes = JSON.parse(localStorage.getItem("hb_recipes") || "[]");
   const el = document.getElementById("recipe_log");
   if (!recipes.length) {
-    el.innerHTML = '<p class="log-empty">No saved recipes yet. Hit Save Recipe to log a snapshot.</p>';
+    el.innerHTML = '<p class="log-empty">No saved recipes yet. Hit Save to log a snapshot.</p>';
     return;
   }
   el.innerHTML = recipes.map(r => `
@@ -400,6 +493,7 @@ function renderLog() {
         </div>
         <button class="btn-delete" onclick="deleteRecipe(${r.id})" title="Delete">✕</button>
       </div>
+      ${r.notes ? `<div class="recipe-notes-bar">📝 ${r.notes}</div>` : ""}
       <div class="recipe-body">
         <div class="recipe-section">
           <h4>Inputs</h4>
@@ -431,10 +525,310 @@ function renderLog() {
   `).join("");
 }
 
+// ── CSV Export ───────────────────────────────────────────────────────────────
+function downloadCSV() {
+  const snap = getSnapshot();
+  const name = snap.name || "homebrew-calc";
+  const q    = s => `"${String(s === null || s === undefined ? "" : s).replace(/"/g, '""')}"`;
+  const rows = [
+    ["Homebrew Calculator Export"],
+    ["Recipe Name", q(snap.name || "(unnamed)")],
+    ["Date",        q(snap.date)],
+    ["Notes",       q(snap.notes)],
+    [],
+    ["INPUTS"],
+    ["Compound",                   q(snap.fullname)],
+    ["Displacement Ratio (mL/g)",  snap.disp],
+    ["BB%",                        snap.bb_pct + "%"],
+    ["BA%",                        snap.ba_pct + "%"],
+    ["EO%",                        snap.eo_pct + "%"],
+    ["Carrier Oil",                q(snap.carrierName)],
+    ["Carrier Oil%",               snap.carrier_pct.toFixed(1) + "%"],
+    [],
+    ["SECTION 1 — From Powder Packet"],
+    ["Powder (g)",                 fmt(snap.s1.grams)],
+    ["Concentration (mg/mL)",      fmt(snap.s1.conc)],
+    ["Total Volume (mL)",          fmt(snap.s1.total_vol)],
+    ["Displacement Vol (mL)",      fmt(snap.s1.disp_vol)],
+    ["Solvent Volume (mL)",        fmt(snap.s1.solvent)],
+    ["BB (mL)",                    fmt(snap.s1.bb)],
+    ["BA (mL)",                    fmt(snap.s1.ba)],
+    ["EO (mL)",                    fmt(snap.s1.eo)],
+    [q(snap.carrierName + " (mL)"), fmt(snap.s1.carrier)],
+    ["Conc Check (mg/mL)",         fmt(snap.s1.check)],
+    [],
+    ["SECTION 2 — Target Volume"],
+    ["Target Volume (mL)",         fmt(snap.s2.vol)],
+    ["Target Conc (mg/mL)",        fmt(snap.s2.conc)],
+    ["Powder Needed (g)",          fmt(snap.s2.grams)],
+    ["Displacement Vol (mL)",      fmt(snap.s2.disp_vol)],
+    ["Solvent Volume (mL)",        fmt(snap.s2.solvent)],
+    ["BB (mL)",                    fmt(snap.s2.bb)],
+    ["BA (mL)",                    fmt(snap.s2.ba)],
+    ["EO (mL)",                    fmt(snap.s2.eo)],
+    [q(snap.carrierName + " (mL)"), fmt(snap.s2.carrier)],
+    ["Conc Check (mg/mL)",         fmt(snap.s2.check)],
+  ];
+  const csv  = rows.map(r => r.join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = name + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── PDF Export ───────────────────────────────────────────────────────────────
+function downloadPDF() {
+  if (!window.jspdf) { showToast("PDF library loading — try again in a moment."); return; }
+  const { jsPDF } = window.jspdf;
+  const snap = getSnapshot();
+  const name = snap.name || "homebrew-calc";
+  const doc  = new jsPDF({ unit: "mm", format: "letter" });
+
+  const L = 18, R = 194, W = R - L;
+  let y = 18;
+
+  // Header band
+  doc.setFillColor(174, 214, 241);
+  doc.roundedRect(L - 4, y - 5, W + 8, 13, 2, 2, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(26, 58, 92);
+  doc.text("Homebrew Calculator", L + W / 2, y + 3.5, { align: "center" });
+  y += 14;
+
+  if (snap.name) {
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(26, 58, 92);
+    doc.text(snap.name, L, y + 4);
+    y += 8;
+  }
+  doc.setFontSize(8.5);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(110, 110, 110);
+  doc.text(snap.date, L, y + 4);
+  y += 8;
+
+  if (snap.notes) {
+    doc.setFillColor(255, 253, 231);
+    const noteLines = doc.splitTextToSize("Notes: " + snap.notes, W - 4);
+    const noteH = noteLines.length * 4.5 + 5;
+    doc.roundedRect(L - 2, y, W + 4, noteH, 2, 2, "F");
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(80, 60, 20);
+    doc.text(noteLines, L + 1, y + 4.5);
+    y += noteH + 4;
+  }
+
+  doc.setDrawColor(180, 210, 235);
+  doc.setLineWidth(0.4);
+  doc.line(L, y, R, y);
+  y += 5;
+
+  function section(title, rgb) {
+    doc.setFillColor(...rgb);
+    doc.roundedRect(L - 2, y, W + 4, 7.5, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(26, 58, 92);
+    doc.text(title, L + 1, y + 5);
+    y += 10;
+  }
+
+  function row(label, value, altBg) {
+    if (altBg) { doc.setFillColor(...altBg); doc.rect(L - 2, y - 0.5, W + 4, 6, "F"); }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(70, 70, 70);
+    doc.text(String(label), L, y + 3.8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(26, 32, 44);
+    doc.text(String(value), R, y + 3.8, { align: "right" });
+    y += 5.5;
+  }
+
+  section("Inputs", [220, 235, 245]);
+  row("Compound",             snap.fullname);
+  row("Displacement Ratio",   snap.disp + " mL/g");
+  row("BB / BA / EO",         snap.bb_pct + "% / " + snap.ba_pct + "% / " + snap.eo_pct + "%");
+  row("Carrier Oil",          snap.carrierName + " (" + snap.carrier_pct.toFixed(1) + "%)");
+  y += 3;
+
+  section("Section 1 — From Powder Packet", [213, 243, 226]);
+  row("Powder",               fmt(snap.s1.grams) + " g");
+  row("Target Concentration", fmt(snap.s1.conc) + " mg/mL");
+  row("Total Volume",         fmt(snap.s1.total_vol) + " mL", [230, 250, 238]);
+  row("Displacement Volume",  fmt(snap.s1.disp_vol) + " mL");
+  row("Solvent Volume",       fmt(snap.s1.solvent) + " mL");
+  row("BB",                   fmt(snap.s1.bb) + " mL");
+  row("BA",                   fmt(snap.s1.ba) + " mL");
+  row("EO",                   fmt(snap.s1.eo) + " mL");
+  row(snap.carrierName,       fmt(snap.s1.carrier) + " mL");
+  row("Concentration Check",  fmt(snap.s1.check) + " mg/mL", [230, 250, 238]);
+  y += 3;
+
+  section("Section 2 — Target Volume", [213, 243, 226]);
+  row("Target Volume",        fmt(snap.s2.vol) + " mL");
+  row("Target Concentration", fmt(snap.s2.conc) + " mg/mL");
+  row("Powder Needed",        fmt(snap.s2.grams) + " g", [230, 250, 238]);
+  row("Displacement Volume",  fmt(snap.s2.disp_vol) + " mL");
+  row("Solvent Volume",       fmt(snap.s2.solvent) + " mL");
+  row("BB",                   fmt(snap.s2.bb) + " mL");
+  row("BA",                   fmt(snap.s2.ba) + " mL");
+  row("EO",                   fmt(snap.s2.eo) + " mL");
+  row(snap.carrierName,       fmt(snap.s2.carrier) + " mL");
+  row("Concentration Check",  fmt(snap.s2.check) + " mg/mL", [230, 250, 238]);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(170, 170, 170);
+  doc.text("Generated by Homebrew Calc", L + W / 2, 268, { align: "center" });
+
+  doc.save(name + ".pdf");
+}
+
+// ── Sharing ──────────────────────────────────────────────────────────────────
+function getShareURL() {
+  const car = document.getElementById("carrier_oil").value === "GSO" ? "1" : "0";
+  const name  = document.getElementById("recipe_name").value.trim();
+  const notes = document.getElementById("recipe_notes").value.trim();
+  const params = new URLSearchParams({
+    c:  document.getElementById("nickname").value,
+    d:  document.getElementById("displacement").value,
+    bb: v("pct_bb"), ba: v("pct_ba"), eo: v("pct_eo"),
+    car,
+    g:  v("s1_grams"), gc: v("s1_conc"),
+    vl: v("s2_vol"),   vc: v("s2_conc"),
+  });
+  if (name)  params.set("n",     name);
+  if (notes) params.set("notes", notes);
+  return window.location.origin + window.location.pathname + "?" + params.toString();
+}
+
+function restoreFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("c")) return;
+
+  const set = (id, key) => { if (params.has(key)) document.getElementById(id).value = params.get(key); };
+  set("pct_bb",   "bb");
+  set("pct_ba",   "ba");
+  set("pct_eo",   "eo");
+  set("s1_grams", "g");
+  set("s1_conc",  "gc");
+  set("s2_vol",   "vl");
+  set("s2_conc",  "vc");
+  if (params.get("car") === "1") document.getElementById("carrier_oil").value = "GSO";
+
+  const nick = params.get("c");
+  const sel  = document.getElementById("nickname");
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === nick) { sel.selectedIndex = i; break; }
+  }
+  onNicknameChange();
+  if (params.has("d")) { document.getElementById("displacement").value = params.get("d"); recalc(); }
+  set("recipe_name",  "n");
+  set("recipe_notes", "notes");
+  showToast("Calculator restored from shared link.");
+}
+
+function shareAction() {
+  const url  = getShareURL();
+  const name = document.getElementById("recipe_name").value.trim() || "Homebrew Recipe";
+  const text = name + "\n" + url;
+
+  document.getElementById("share-email-link").href =
+    "mailto:?subject=" + encodeURIComponent(name) + "&body=" + encodeURIComponent(text);
+  document.getElementById("share-whatsapp-link").href =
+    "https://wa.me/?text=" + encodeURIComponent(text);
+
+  if (navigator.share) {
+    document.getElementById("share-native-btn").style.display = "flex";
+  }
+  document.getElementById("share-modal").style.display = "flex";
+}
+
+function nativeShare() {
+  const name = document.getElementById("recipe_name").value.trim() || "Homebrew Recipe";
+  navigator.share({ title: name, text: name, url: getShareURL() }).catch(() => {});
+}
+
+function copyShareLink() {
+  const url = getShareURL();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      closeShareModal();
+      showToast("Link copied to clipboard!");
+    }).catch(() => showToast("Copy failed — try selecting the address bar."));
+  } else {
+    const inp = document.createElement("input");
+    inp.value = url;
+    document.body.appendChild(inp);
+    inp.select();
+    document.execCommand("copy");
+    document.body.removeChild(inp);
+    closeShareModal();
+    showToast("Link copied!");
+  }
+}
+
+function closeShareModal() {
+  document.getElementById("share-modal").style.display = "none";
+}
+
+// ── Google Sheets ────────────────────────────────────────────────────────────
+function openInGoogleSheets() {
+  // Backend hook: set window.GOOGLE_SHEETS_API_URL to enable direct one-click sheet creation
+  // via Google Sheets API v4. The endpoint should accept POST JSON (snap object)
+  // and return { url: "https://docs.google.com/spreadsheets/d/..." }
+  if (window.GOOGLE_SHEETS_API_URL) {
+    const snap = getSnapshot();
+    fetch(window.GOOGLE_SHEETS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(snap),
+    })
+      .then(r => r.json())
+      .then(data => { if (data.url) window.open(data.url, "_blank"); })
+      .catch(() => { showToast("API error — falling back to CSV."); sheetsManual(); });
+    return;
+  }
+  sheetsManual();
+}
+
+function sheetsManual() {
+  downloadCSV();
+  setTimeout(() => {
+    window.open("https://sheets.new", "_blank");
+    showToast("CSV downloaded! In Google Sheets: File → Import → Upload your file.", 6000);
+  }, 300);
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, duration) {
+  duration = duration || 3500;
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.transition = "opacity 0.3s";
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+  }, duration);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
 buildDropdown();
 buildLibrary();
 onNicknameChange();
 renderLog();
+restoreFromURL();
 </script>
 </body>
 </html>
